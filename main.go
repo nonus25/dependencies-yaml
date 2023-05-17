@@ -5,13 +5,15 @@ import (
 )
 
 func main() {
-	s, err := NewEdgeDependency()
+	s, err := NewDependency()
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(s["cumulocityComponents"])
+	fmt.Printf("%#v\n", s.GetComponents(CUMULOCITY_CORE))
+	c := s.GetComponent(CUMULOCITY_IOT_EDGE_OPERATOR)
+	fmt.Printf("%#v\n", c)
 	//o := s.GetCategory("operator")
-	//fmt.Println(s.GetComponentsForCategory("operator"))
+	fmt.Println(c.Location)
 
 	/*d := make(Dependencies, 0)
 	c := make(Category, 0)

@@ -7,7 +7,7 @@ operator:
     location: sag/kubernetes-edge/1017.0.0/cacerts                       
     version: latest                                           
 
-cumulocityComponents:
+cumulocityCore:
   cumulocity-core-helm-charts:
     componentSearchString: cumulocity-core helm chart
     location: chartrepo/stack/cumulocity-core
@@ -112,13 +112,13 @@ cumulocityWebapps:
     location: sag/kubernetes-edge/1017.0.0/devicemanagement-1017.0.13.zip
     version: 1017.0.0
 
-  Streaming Analytics:
+  streamingAnalytics:
     optional: false
     componentSearchString: streaming-analytics-app
     location: sag/kubernetes-edge/1017.0.0/streaming-analytics-app-10.17.0.0.20230131-1844-3afe51bcf.zip
     version: 1017.0.0
 
-thirdpartyComponents:                                                 # 3rd party versions are maintained manually
+thirdparty:                                                 # 3rd party versions are maintained manually
   mongo-operator-helm-charts:
     repositoryUrl: https://percona.github.io/percona-helm-charts/
     location: percona/psmdb-operator 

@@ -5,15 +5,14 @@ import (
 	"io"
 	"os"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
-type Dependencies map[string]Category
+type Dependencies map[string]*Category
 
-type Category map[string]Component
+type Category map[string]*Component
 
 type Component struct {
-	Name                  string     `yaml:"name"`
 	Location              string     `yaml:"location"`
 	Version               string     `yaml:"version"`
 	ContextPath           string     `yaml:"contextPath,omitempty"`
@@ -23,11 +22,11 @@ type Component struct {
 	Resources             *Resources `yaml:"resources,omitempty"`
 }
 type Limits struct {
-	CPU    string `yaml:"cpu,omitempty"`
+	Cpu    string `yaml:"cpu,omitempty"`
 	Memory string `yaml:"memory,omitempty"`
 }
 type Requests struct {
-	CPU    string `yaml:"cpu,omitempty"`
+	Cpu    string `yaml:"cpu,omitempty"`
 	Memory string `yaml:"memory,omitempty"`
 }
 type Resources struct {
@@ -35,133 +34,20 @@ type Resources struct {
 	Requests Requests `yaml:"requests,omitempty"`
 }
 
-func (resources *Resources) GetLimits() *Limits {
-	return &resources.Limits
+func (d Dependencies) GetComponents(category Categories) *Category {
+	return d[category.Name()]
 }
 
-func (resources *Resources) GetRequests() *Requests {
-	return &resources.Requests
+func (d Dependencies) GetComponent(component Components) *Component {
+	category := component.Category()
+	r := *d[category.Name()]
+	return r[component.Name()] //d.GetComponents(category)[component.Name()]
 }
 
-func (resources *Resources) SetLimits(limits Limits) *Resources {
-	resources.Limits = limits
-	return resources
-}
-
-func (resources *Resources) SetRequests(requests Requests) *Resources {
-	resources.Requests = requests
-	return resources
-}
-func (requests *Requests) GetCPU() string {
-	return requests.CPU
-}
-
-func (requests *Requests) GetMemory() string {
-	return requests.Memory
-}
-
-func (requests *Requests) SetCPU(cpu string) *Requests {
-	requests.CPU = cpu
-	return requests
-}
-
-func (requests *Requests) SetMemory(memory string) *Requests {
-	requests.Memory = memory
-	return requests
-}
-func (limits *Limits) GetCPU() string {
-	return limits.CPU
-}
-
-func (limits *Limits) GetMemory() string {
-	return limits.Memory
-}
-
-func (limits *Limits) SetCPU(cpu string) *Limits {
-	limits.CPU = cpu
-	return limits
-}
-
-func (limits *Limits) SetMemory(memory string) *Limits {
-	limits.Memory = memory
-	return limits
-}
-func (component *Component) GetName() string {
-	return component.Name
-}
-
-func (component *Component) GetLocation() string {
-	return component.Location
-}
-
-func (component *Component) GetVersion() string {
-	return component.Version
-}
-
-func (component *Component) GetContextPath() string {
-	return component.ContextPath
-}
-
-func (component *Component) GetOptional() bool {
-	return component.Optional
-}
-
-func (component *Component) GetComponentSearchString() string {
-	return component.ComponentSearchString
-}
-
-func (component *Component) GetRepositoryURL() string {
-	return component.RepositoryURL
-}
-
-func (component *Component) GetResources() *Resources {
-	return component.Resources
-}
-
-func (component *Component) SetName(name string) *Component {
-	component.Name = name
-	return component
-}
-
-func (component *Component) SetLocation(location string) *Component {
-	component.Location = location
-	return component
-}
-
-func (component *Component) SetVersion(version string) *Component {
-	component.Version = version
-	return component
-}
-
-func (component *Component) SetContextPath(contextPath string) *Component {
-	component.ContextPath = contextPath
-	return component
-}
-
-func (component *Component) SetOptional(optional bool) *Component {
-	component.Optional = optional
-	return component
-}
-
-func (component *Component) SetComponentSearchString(componentSearchString string) *Component {
-	component.ComponentSearchString = componentSearchString
-	return component
-}
-
-func (component *Component) SetRepositoryURL(repositoryURL string) *Component {
-	component.RepositoryURL = repositoryURL
-	return component
-}
-
-func (component *Component) SetResources(resources *Resources) *Component {
-	component.Resources = resources
-	return component
-}
-
-func NewEdgeDependency() (*Dependencies, error) {
+func NewDependency() (*Dependencies, error) {
 
 	var (
-		yamlDependenciesPath string = "/home/auc/go/src/github.com/nXnus25/yaml-conversion/dependencies.yaml"
+		yamlDependenciesPath string = fmt.Sprintf("%s/dependencies.yaml", "/data/ach/go/src/github.com/nonus25/dependencies-yaml")
 	)
 
 	yml, err := os.Open(yamlDependenciesPath)
@@ -175,8 +61,6 @@ func NewEdgeDependency() (*Dependencies, error) {
 		return nil, err
 	}
 
-	//fmt.Println(string(ymlBytes))
-
 	d := &Dependencies{}
 
 	err = yaml.Unmarshal(ymlBytes, d)
@@ -184,23 +68,52 @@ func NewEdgeDependency() (*Dependencies, error) {
 		return nil, err
 	}
 
-	fmt.Println("---\n", d)
-
 	return d, nil
 }
 
-func (d Dependencies) GetCategory(name string) Category {
-	if name != "" {
+type Categories string
 
-		fmt.Println(name, "  ")
+const (
+	OPERATOR        Categories = "operator"
+	CUMULOCITY_CORE Categories = "cumulocityCore"
+)
 
-		return d[name]
-	}
-	return nil
+func (c Categories) Name() string {
+	return string(c)
 }
 
-func (d Dependencies) GetComponentsForCategory(categoryName string) Component {
-	c := d.GetCategory(categoryName)
+func (c Categories) String() string {
+	return string(c)
+}
 
-	return c["operator"]
+type Components uint
+
+const (
+	CUMULOCITY_IOT_EDGE_OPERATOR Components = iota
+	CUMULOCITY_CORE_HELM_CHARTS
+)
+
+func (c Components) Category() Categories {
+	switch c {
+	case CUMULOCITY_IOT_EDGE_OPERATOR:
+		return OPERATOR
+	case CUMULOCITY_CORE_HELM_CHARTS:
+		return CUMULOCITY_CORE
+	default:
+		return Categories("unknown")
+	}
+}
+
+func (c Components) Name() string {
+	switch c {
+	case CUMULOCITY_IOT_EDGE_OPERATOR:
+		return "cumulocity-iot-edge-operator"
+	case CUMULOCITY_CORE_HELM_CHARTS:
+		return "cumulocity-core-helm-charts"
+	}
+	return string(c)
+}
+
+func (c Components) String() string {
+	return string(c)
 }

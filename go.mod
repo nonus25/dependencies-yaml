@@ -1,4 +1,4 @@
-module github.com/nXnus25/yaml-conversion
+module github.com/nXnus25/dependencies-yaml
 
 go 1.20
 

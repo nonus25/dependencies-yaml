@@ -1,0 +1,27 @@
+thirdpartyComponents:                                                 # 3rd party versions are maintained manually
+- name: mongo-operator-helm-charts
+  repositoryUrl: https://percona.github.io/percona-helm-charts/
+  location: percona/psmdb-operator 
+  version: 1.14.0
+
+- name: mongo-server-helm-charts
+  repositoryUrl: https://percona.github.io/percona-helm-charts/
+  location: percona/psmdb-db 
+  version: 1.14.0
+
+mongo:
+- name: mongo
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2G
+    requests:
+      cpu: 1000m
+      memory: 1G
+  location: percona/percona-server-mongodb                          
+  version: 5.0.14
+
+- name: logging-operator-helm-charts
+  repositoryUrl: https://kubernetes-charts.banzaicloud.com         
+  location: banzaicloud-stable/logging-operator 
+  version: 3.17.10

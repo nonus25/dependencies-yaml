@@ -1,19 +1,25 @@
+---
+
 operator:
   cumulocity-iot-edge-operator:
+    name: cumulocity-iot-edge-operator
     location: chartrepo/edge/cumulocity-iot-edge-operator
     version: 1017.0.0-2224
 
   cacerts:
+    name: cacerts
     location: sag/kubernetes-edge/1017.0.0/cacerts                       
     version: latest                                           
 
 cumulocityCore:
   cumulocity-core-helm-charts:
+    name: cumulocity-core-helm-charts
     componentSearchString: cumulocity-core helm chart
     location: chartrepo/stack/cumulocity-core
     version: 1017.0.13
 
-  cumulocity-core:
+  cumulocity-core-image:
+    name:  cumulocity-core-image
     resources:
       limits:
         cpu: 2000m
@@ -26,10 +32,12 @@ cumulocityCore:
     version: 1017.0.13-1
 
   openresty:
+    name: openresty
     location: stack/openresty
     version: 1.19.3.2-20.el7.c8y.1011.0.0
 
   registry:
+    name: registry
     resources:
       limits:
         cpu: 500m
@@ -41,15 +49,18 @@ cumulocityCore:
     version: 2.8.2
 
   alpine_acl:
+    name: alpine_acl
     location: stack/alpine_acl
     version: latest                                         
 
   busybox:
+    name: busybox 
     location: stack/busybox
     version: latest                                         
 
 cumulocityMicroservices:
   apama-ctrl:
+    name: apama-ctrl
     contextPath: cep
     optional: false
     resources:
@@ -61,6 +72,7 @@ cumulocityMicroservices:
     version: 1017.0.0
 
   smartrule:
+    name: smartrule
     contextPath: smartrule
     optional: false
     resources:
@@ -72,6 +84,7 @@ cumulocityMicroservices:
     version: 1017.0.0
 
   opcua-mgmt-service:
+    name: opcua-mgmt-service
     contextPath: opcua-mgmt-service
     optional: false
     resources:
@@ -83,6 +96,7 @@ cumulocityMicroservices:
     version: 1017.0.0
 
   device-simulator:
+    name: device-simulator
     contextPath: device-simulator
     optional: false
     resources:
@@ -95,41 +109,48 @@ cumulocityMicroservices:
 
 cumulocityWebapps:
   administration:
+    name: administration
     optional: false
     componentSearchString: administration
     location: sag/kubernetes-edge/1017.0.0/administration-1017.0.13.zip
     version: 1017.0.0
 
   cockpit:
+    name: cockpit
     optional: false
     componentSearchString: cockpit
     location: sag/kubernetes-edge/1017.0.0/cockpit-1017.0.13.zip
     version: 1017.0.0
 
   devicemanagement:
+    name: "devicemanagement"
     optional: false
-    componentSearchString: devicemanagement
+    componentSearchString: device-management
     location: sag/kubernetes-edge/1017.0.0/devicemanagement-1017.0.13.zip
     version: 1017.0.0
 
-  streamingAnalytics:
+  streaming-analytics:
+    name: "Streaming Analytics"
     optional: false
     componentSearchString: streaming-analytics-app
     location: sag/kubernetes-edge/1017.0.0/streaming-analytics-app-10.17.0.0.20230131-1844-3afe51bcf.zip
     version: 1017.0.0
 
-thirdparty:                                                 # 3rd party versions are maintained manually
+thirdparty:                                                 
   mongo-operator-helm-charts:
+    name: mongo-operator-helm-charts
     repositoryUrl: https://percona.github.io/percona-helm-charts/
     location: percona/psmdb-operator 
     version: 1.14.0
 
   mongo-server-helm-charts:
+    name: mongo-server-helm-charts
     repositoryUrl: https://percona.github.io/percona-helm-charts/
     location: percona/psmdb-db 
     version: 1.14.0
 
   mongo:
+    name: mongo
     resources:
       limits:
         cpu: 1000m
@@ -141,6 +162,7 @@ thirdparty:                                                 # 3rd party versions
     version: 5.0.14
 
   logging-operator-helm-charts:
+    name: logging-operator-helm-charts
     repositoryUrl: https://kubernetes-charts.banzaicloud.com         
     location: banzaicloud-stable/logging-operator 
     version: 3.17.10

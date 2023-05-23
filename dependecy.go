@@ -8,10 +8,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Dependencies stores categories
+// the map represents the file called dependencies.yaml
 type Dependencies map[string]*Category
 
+// Category represents map of root level tags in dependencies.yaml file
+// Operator version
+// Core components versions and their respective locations
+// External 3rd party components (e.g. registry, Percona operator, MongoDB, etc.) versions and their respective locations
 type Category map[string]*Component
 
+// Component represents the structure and details
+// Name, Location and Version are mandatory fields
 type Component struct {
 	Name                  string     `yaml:"name"`
 	Location              string     `yaml:"location"`
@@ -22,6 +30,11 @@ type Component struct {
 	RepositoryURL         string     `yaml:"repositoryUrl,omitempty"`
 	Resources             *Resources `yaml:"resources,omitempty"`
 }
+
+type Resources struct {
+	Limits   Limits   `yaml:"limits,omitempty"`
+	Requests Requests `yaml:"requests,omitempty"`
+}
 type Limits struct {
 	Cpu    string `yaml:"cpu,omitempty"`
 	Memory string `yaml:"memory,omitempty"`
@@ -30,21 +43,22 @@ type Requests struct {
 	Cpu    string `yaml:"cpu,omitempty"`
 	Memory string `yaml:"memory,omitempty"`
 }
-type Resources struct {
-	Limits   Limits   `yaml:"limits,omitempty"`
-	Requests Requests `yaml:"requests,omitempty"`
-}
 
+// getter for all components in a category
+// by specifying category we are getting map of components
 func (d Dependencies) GetComponents(category Categories) *Category {
 	return d[category.Name()]
 }
 
+// getter for specific component
+// by specifying component name
 func (d Dependencies) GetComponent(component Components) *Component {
 	category := component.Category()
 	r := *d[category.Name()]
 	return r[component.Name()]
 }
 
+// loads and parse YAML dependencies file
 func NewDependency() (*Dependencies, error) {
 
 	var (
@@ -53,25 +67,39 @@ func NewDependency() (*Dependencies, error) {
 
 	yml, err := os.Open(yamlDependenciesPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open [%v] - %v", yamlDependenciesPath, err)
 	}
 	defer yml.Close()
 
 	ymlBytes, err := io.ReadAll(yml)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read [%v] - %v", yamlDependenciesPath, err)
 	}
 
-	d := &Dependencies{}
+	if d, err := parseDependenciesYaml(ymlBytes); err != nil {
+		return nil, fmt.Errorf("failed to parse yaml [%v] - %v", yamlDependenciesPath, err)
+	} else {
+		return d, nil
+	}
+}
 
-	err = yaml.Unmarshal(ymlBytes, d)
+// function is parsing dependencies.yaml file
+// split it into separate function for unit tests
+func parseDependenciesYaml(input []byte) (*Dependencies, error) {
+	d := &Dependencies{}
+	fmt.Println(string(input))
+
+	err := yaml.Unmarshal(input, d)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal yaml - %v", err)
 	}
 
 	return d, nil
 }
 
+// all categories represented via enum
+// listed in dependencies.yaml file
+// new added category in Yaml needs to be also added here and vice versa
 type Categories string
 
 const (
@@ -90,6 +118,8 @@ func (c Categories) String() string {
 	return string(c)
 }
 
+// all components listed in dependencies.yaml file
+// new dependency added to the file need to be also added here and vice versa
 type Components uint
 
 const (
@@ -115,6 +145,7 @@ const (
 	LOGGING_OPERATOR_HELM_CHARTS
 )
 
+// returns the category to specific component
 func (c Components) Category() Categories {
 	switch c {
 	case CUMULOCITY_IOT_EDGE_OPERATOR:

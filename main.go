@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 )
 
 func main() {
@@ -9,11 +10,15 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("%#v\n", s.GetComponents(CUMULOCITY_CORE))
-	c := s.GetComponent(CUMULOCITY_IOT_EDGE_OPERATOR)
+	fmt.Printf("%#v\n", s.GetComponents(CUMULOCITY_WEBAPPS))
+	c := s.GetComponent(STREAMING_ANALYTICS)
 	fmt.Printf("%#v\n", c)
 	//o := s.GetCategory("operator")
 	fmt.Println(c.Location)
+	fmt.Println(c.Name)
+
+	g := filepath.Join("/var/assets", "/dependency.yaml")
+	fmt.Println(g)
 
 	/*d := make(Dependencies, 0)
 	c := make(Category, 0)
@@ -33,4 +38,27 @@ func main() {
 	fmt.Println(" --- YAML ---")
 	fmt.Println(string(yamlData))
 	*/
+
+}
+
+type singleton struct {
+	count int
+}
+
+var instance *singleton
+
+func GetInstance() *singleton {
+	if instance == nil {
+		instance = new(singleton)
+	}
+	return instance
+}
+
+func (s *singleton) AddOne() int {
+	s.count++
+	return s.count
+}
+
+func (s singleton) String() string {
+	return fmt.Sprintf("called: %d", s.count)
 }

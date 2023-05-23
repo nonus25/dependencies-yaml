@@ -13,7 +13,7 @@ cumulocityCore:
     location: chartrepo/stack/cumulocity-core
     version: 1017.0.13
 
-  cumulocity-core:
+  cumulocity-core-image:
     resources:
       limits:
         cpu: 2000m
@@ -108,17 +108,18 @@ cumulocityWebapps:
 
   devicemanagement:
     optional: false
-    componentSearchString: devicemanagement
+    componentSearchString: device-management
     location: sag/kubernetes-edge/1017.0.0/devicemanagement-1017.0.13.zip
     version: 1017.0.0
 
-  streamingAnalytics:
+  streaming-analytics:
+    name: "Streaming Analytics"
     optional: false
     componentSearchString: streaming-analytics-app
     location: sag/kubernetes-edge/1017.0.0/streaming-analytics-app-10.17.0.0.20230131-1844-3afe51bcf.zip
     version: 1017.0.0
 
-thirdparty:                                                 # 3rd party versions are maintained manually
+thirdparty:                                                 
   mongo-operator-helm-charts:
     repositoryUrl: https://percona.github.io/percona-helm-charts/
     location: percona/psmdb-operator 
